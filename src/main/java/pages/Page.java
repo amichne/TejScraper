@@ -1,16 +1,13 @@
-package pages;
+package main.java.pages;
 
-import driver.Driver;
-import org.openqa.selenium.By;
+import main.java.driver.Driver;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
-import static driver.Constants.OPEN_WINDOW_CMD;
-import static pages.AttributeConstants.LINK_ATTR;
+import static main.java.driver.Constants.OPEN_WINDOW_CMD;
+import static main.java.pages.PageUtil.getLink;
+import static main.java.pages.PageUtil.waitForElement;
 
 public class Page {
     Driver driver;
@@ -20,23 +17,18 @@ public class Page {
     String xpath;
 
     public Page(Driver driver, String url){
-        init(driver);
-        pageFactory(url);
+        init(driver, url);
     }
 
     public Page(Driver driver, String url, String xpath){
-        // This constructor will load a new page with the URL linked in the passed xPath
-        init(driver);
-        pageFactory(url);
-        // TODO: Configurable
+        init(driver, url);
+        this.xpath = xpath;
         driver.openPage(this);
-        String linkedUrl = driver.getWebDriver().findElement(By.xpath(xpath)).getAttribute(LINK_ATTR);
-        ((JavascriptExecutor) driver.getWebDriver()).executeScript(OPEN_WINDOW_CMD);
-
     }
 
-    private void init(Driver driver){
+    private void init(Driver driver, String url){
         this.driver = driver;
+        pageFactory(url);
     }
 
     private void pageFactory(String url){
@@ -44,16 +36,22 @@ public class Page {
         // This saves us from writing code twice, which we should NEVER DO in OOP
         this.url = url;
         // Open a new window
-        ((JavascriptExecutor) driver).executeScript(OPEN_WINDOW_CMD);
+        ((JavascriptExecutor) driver.getWebDriver()).executeScript(OPEN_WINDOW_CMD);
         // Get the List (actually a set) of all open window handles (which are guaranteed to be unique)
         ArrayList<String> windows = new ArrayList<>(driver.getWebDriver().getWindowHandles());
         // Setting this instances handle, switching to the new (still blank) tab, and navigating to the URL specified
         handle = windows.get(windows.size() - 1);
-        driver.focusPage(this);
+        driver.openPage(this);
     }
 
-    public void destroy(){
+    public Page openHref(String xpath){
+        // TODO HERE
+        waitForElement(driver.getWebDriver(), xpath);
+        return driver.createPage(getLink(driver.getWebDriver(), xpath));
+    }
 
+    public boolean destroy(){
+        return driver.closePage(this);
     }
 
     public String getXpath() {

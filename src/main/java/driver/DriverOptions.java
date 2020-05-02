@@ -1,8 +1,8 @@
-package driver;
+package main.java.driver;
 
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import static driver.Constants.CHROME_OPTIONS;
+import static main.java.driver.Constants.CHROME_OPTIONS;
 
 public class DriverOptions {
     private ChromeOptions chromeOptions;

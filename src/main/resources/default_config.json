@@ -1,0 +1,21 @@
+{
+  "driver": {
+    "name": "webdriver.chrome.driver",
+    "path": "chromedriver"
+  },
+  "explorer": {
+    "root": {
+      "url": "https://www.ebay.com/b/Rolex-Wristwatches/31387/bn_2989578",
+      "href_xpath": "//*[@id=\"s0-25-9-0-1[0]-0-0-xCarousel-x-carousel-items\"]/ul/li[1]",
+      "child": {
+        "href_xpath": "//*[@id=\"s0-25-9-0-1[0]-0-0-xCarousel-x-carousel-items\"]/ul/li[1]/a",
+        "child": {
+          "count_xpath": "//*[@id=\"vi_notification_new\"]/span",
+          "count_regex": "^[0-9]+",
+          "url_regex": "^https://www.ebay.com/itm/*"
+        }
+      }
+    }
+  }
+}
+

@@ -2,13 +2,12 @@ package main.java.helpers;
 
 import main.java.pages.WebTab;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
 
-import static main.java.pages.AttributeConstants.LINK_ATTR;
+import static main.java.pages.AttributeConstants.*;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfAllElementsLocatedBy;
 
 public class WebTabHelper {
@@ -41,12 +40,26 @@ public class WebTabHelper {
     }
 
     public static ArrayList<WebElement> getWebElementsUl(WebTab webTab, String xpath){
-        return new ArrayList<>(webTab.getDriver().getWebDriver().findElements(By.xpath(xpath)));
+        validateXpathListItems(xpath);
+        WebElement webElement = webTab.getDriver().getWebDriver().findElement(By.xpath(xpath));
+        return new ArrayList<>(webElement.findElements(By.tagName("li")));
     }
+
+    private static void validateXpathListItems(String xpath) {
+        if (!xpath.endsWith(LI_ATTR)){
+            throw new RuntimeException("Iterable xpaths must end with \"li\", received xpath: " + xpath);
+        }
+    }
+
+
+//    public static String getXpath(WebElement webElement){
+//        [ChromeDriver: chrome on MAC (2369a811d66351c21669bd409a54e812)] -> xpath: //*[@id="s0-25-9-0-1[0]-0-0-xCarousel-x-carousel-items"]/ul
+//        return webElement.toString().split("xpath: ")[0];
+//    }
 
     public static void validateRelativeXpath(String xpath){
         if (xpath == null || !xpath.startsWith("//")) {
-            throw new RuntimeException("Received invalid xpath, must be absolute xpath, got: " + xpath);
+            throw new RuntimeException("Received invalid xpath, must be relative xpath, got: " + xpath);
         }
     }
 

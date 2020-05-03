@@ -7,8 +7,13 @@ import main.java.pages.WebTab;
 import main.java.pojos.BasePage;
 import main.java.pojos.CountablePage;
 import main.java.pojos.LinkedPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static main.java.helpers.GsonHelper.start;
 import static main.java.helpers.WebTabHelper.*;
 
 public class Explorer {
@@ -24,7 +29,7 @@ public class Explorer {
 
     public Results explore(Driver driver){
         if (root == null || root.getUrl() == null){
-            throw new RuntimeException("Root was null or had no url. Received root: "+GsonHelper.start().toJson(root));
+            throw new RuntimeException("Root was null or had no url. Received root: " + start().toJson(root));
         }
 
         Results results = new Results();
@@ -45,7 +50,7 @@ public class Explorer {
                 explore(results, webTab, (LinkedPage) page);
             }
             else {
-
+                explore(results, webTab, Explorer.defaultCountable);
             }
         }
     }

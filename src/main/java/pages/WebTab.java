@@ -34,6 +34,7 @@ public class WebTab {
         // Setting this instances handle, switching to the new (still blank) tab, and navigating to the URL specified
         handle = windows.get(windows.size() - 1);
         driver.focusWebTab(this);
+        driver.navigateWebTab(this);
         alive = true;
     }
 

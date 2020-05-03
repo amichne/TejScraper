@@ -3,7 +3,7 @@ package main.java.pojos;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
-import main.java.helpers.JsonHelper;
+import main.java.scraper.Explorer;
 
 import static main.java.helpers.JsonHelper.getString;
 import static main.java.helpers.JsonHelper.hasField;
@@ -15,6 +15,9 @@ public class BasePage {
 
     @SerializedName(HREF_XPATH)
     private String hrefXpath;
+
+    @SerializedName(LI_HREF_XPATH)
+    private String liHrefPath;
 
     public BasePage(){}
 
@@ -37,12 +40,12 @@ public class BasePage {
     public static <T extends BasePage> T factory(JsonElement jsonElement){
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         if (hasField(jsonObject, CHILD)){
-            return (T) SingleBranchPage.factory(jsonObject);
+            return (T) LinkedPage.factory(jsonObject);
         }
         if (hasField(jsonObject, COUNT_XPATH)){
             return (T) CountablePage.factory(jsonObject);
         }
-        throw new RuntimeException("No valid schema determined for element:\n" + jsonElement.toString());
+        return (T) Explorer.defaultCountable;
     }
 
     public String getUrl() {
@@ -59,5 +62,13 @@ public class BasePage {
 
     public void setHrefXpath(String hrefXpath) {
         this.hrefXpath = hrefXpath;
+    }
+
+    public String getLiHrefPath() {
+        return liHrefPath;
+    }
+
+    public void setLiHrefPath(String liHrefPath) {
+        this.liHrefPath = liHrefPath;
     }
 }

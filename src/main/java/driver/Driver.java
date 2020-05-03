@@ -1,32 +1,32 @@
 package main.java.driver;
 
+import main.java.config.DriverConfig;
+import main.java.pages.WebTab;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import main.java.pages.Page;
 
 import java.util.ArrayList;
 
-import static main.java.driver.Constants.CHROME_DRIVER_NAME;
-import static main.java.driver.Constants.CHROME_DRIVER_PATH;
-import static main.java.pages.PageUtil.waitForElement;
+import static main.java.driver.DriverConstants.CHROME_DRIVER_NAME;
+import static main.java.driver.DriverConstants.CHROME_DRIVER_PATH;
 
 public class Driver {
     private WebDriver webDriver;
     private DriverOptions driverOptions;
-    private ArrayList<Page> pages;
+    private ArrayList<WebTab> webTabs;
 
     public Driver(){
         driverOptions = new DriverOptions();
         init(CHROME_DRIVER_NAME, CHROME_DRIVER_PATH);
     }
 
-    public Driver(String driverName, String driverPath) {
+    public Driver(DriverConfig driverConfig) {
         driverOptions = new DriverOptions();
-        init(driverName, driverPath);
+        init(driverConfig.getName(), driverConfig.getPath());
     }
 
     private void init(String driverName, String driverPath){
-        pages = new ArrayList<>();
+        webTabs = new ArrayList<>();
         System.setProperty(driverName, driverPath);
         if (CHROME_DRIVER_NAME.equalsIgnoreCase(driverName)){
             webDriver = new ChromeDriver(driverOptions.getChromeOptions());
@@ -36,43 +36,32 @@ public class Driver {
         }
     }
 
-    public Page createPage(String url){
-        Page page = new Page(this, url);
-        pages.add(page);
-        return page;
+    public WebTab createWebTab(String url){
+        WebTab webTab = new WebTab(this, url);
+        webTabs.add(webTab);
+        focusWebTab(webTab);
+        return webTab;
     }
 
-    public void focusPage(Page page) {
-        webDriver.switchTo().window(page.getHandle());
+    public void navigateWebTab(WebTab webTab){
+        focusWebTab(webTab);
+        webDriver.navigate().to(webTab.getUrl());
     }
 
-    public void openPage(Page page){
-        focusPage(page);
-        if (page.getXpath() != null){
-            blockingOpenPage(page);
-        }
-        else {
-            defaultOpenPage(page);
-        }
-        pages.add(page);
+    public void focusWebTab(WebTab webTab){
+        // Focuses the WebTab, and if it has a defined xPath it waits for that element to be loaded
+        // TODO: Clean up the webTabs list properly
+        webDriver.switchTo().window(webTab.getHandle());
+        webTabs.add(webTab);
     }
 
-    private void defaultOpenPage(Page page){
-        webDriver.navigate().to(page.getUrl());
-    }
-
-    private void blockingOpenPage(Page page){
-        defaultOpenPage(page);
-        waitForElement(webDriver, page.getXpath());
-    }
-
-    public boolean closePage(Page pageToClose){
+    public boolean closeWebTab(WebTab webTabToClose){
         // Return true if we found the page in our list of main.java.pages and closed it
         // Return false otherwise
-        for (int i = 0; i < pages.size(); i++){
-            if (pages.get(i).getHandle().equals(pageToClose.getHandle())){
+        for (int i = 0; i < webTabs.size(); i++){
+            if (webTabs.get(i).getHandle().equals(webTabToClose.getHandle())){
                 webDriver.close();
-                pages.remove(i);
+                webTabs.remove(i);
                 return true;
             }
         }
@@ -89,12 +78,6 @@ public class Driver {
 
     public void kill(){
         webDriver.quit();
-    }
-
-    public static void main(String[] args){
-        Driver driver = new Driver("webdriver.chrome.main.java.driver", "chromedriver");
-
-        driver.getWebDriver().close();
     }
 }
 

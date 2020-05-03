@@ -2,9 +2,6 @@ package main.java.helpers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import main.java.pojos.BasePage;
-
-import java.util.ArrayList;
 
 public class JsonHelper {
 

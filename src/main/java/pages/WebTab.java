@@ -5,33 +5,25 @@ import org.openqa.selenium.JavascriptExecutor;
 
 import java.util.ArrayList;
 
-import static main.java.driver.Constants.OPEN_WINDOW_CMD;
-import static main.java.pages.PageUtil.getLink;
-import static main.java.pages.PageUtil.waitForElement;
+import static main.java.driver.DriverConstants.OPEN_WINDOW_CMD;
 
-public class Page {
-    Driver driver;
-    String handle;
-    String url;
+public class WebTab {
+    protected Driver driver;
+    protected String handle;
+    protected String url;
+    protected boolean alive;
     // If not null, when loading the page this is the xPath is will block on
-    String xpath;
 
-    public Page(Driver driver, String url){
+    public WebTab(Driver driver, String url){
         init(driver, url);
-    }
-
-    public Page(Driver driver, String url, String xpath){
-        init(driver, url);
-        this.xpath = xpath;
-        driver.openPage(this);
     }
 
     private void init(Driver driver, String url){
         this.driver = driver;
-        pageFactory(url);
+        webTabFactory(url);
     }
 
-    private void pageFactory(String url){
+    private void webTabFactory(String url){
         // Used as a generic initializer for all Page objects, sets the common fields for all constructor patterns
         // This saves us from writing code twice, which we should NEVER DO in OOP
         this.url = url;
@@ -41,21 +33,36 @@ public class Page {
         ArrayList<String> windows = new ArrayList<>(driver.getWebDriver().getWindowHandles());
         // Setting this instances handle, switching to the new (still blank) tab, and navigating to the URL specified
         handle = windows.get(windows.size() - 1);
-        driver.openPage(this);
+        driver.focusWebTab(this);
+        alive = true;
     }
 
-    public Page openHref(String xpath){
-        // TODO HERE
-        waitForElement(driver.getWebDriver(), xpath);
-        return driver.createPage(getLink(driver.getWebDriver(), xpath));
+    public WebTab openUrl(String url, boolean inPlace){
+        if (inPlace){
+            return openUrl(url);
+        }
+        else {
+            return driver.createWebTab(url);
+        }
     }
 
-    public boolean destroy(){
-        return driver.closePage(this);
+    public WebTab openUrl(String url){
+        this.url = url;
+        driver.navigateWebTab(this);
+        return this;
     }
 
-    public String getXpath() {
-        return xpath;
+    public boolean kill(){
+        alive = false;
+        return driver.closeWebTab(this);
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public Driver getDriver() {
+        return driver;
     }
 
     public String getHandle() {
